@@ -184,6 +184,7 @@ func parseAddr(m []byte) (addr Addr, family, index int, err error) {
 }
 
 type AddrUpdate struct {
+	Addr		Addr
 	LinkAddress net.IPNet
 	LinkIndex   int
 	NewAddr     bool // true=added false=deleted
@@ -223,7 +224,12 @@ func AddrSubscribe(ch chan<- AddrUpdate, done <-chan struct{}) error {
 					continue
 				}
 
-				ch <- AddrUpdate{LinkAddress: *addr.IPNet, LinkIndex: ifindex, NewAddr: msgType == syscall.RTM_NEWADDR}
+				ch <- AddrUpdate{
+					Addr:	     addr,
+					LinkAddress: *addr.IPNet,
+					LinkIndex:   ifindex,
+					NewAddr:     msgType == syscall.RTM_NEWADDR,
+				}
 			}
 		}
 	}()
